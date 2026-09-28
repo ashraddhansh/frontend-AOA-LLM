@@ -18,6 +18,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { GoogleLogin } from "@react-oauth/google";
+import loginImageUrl from "../image-for-login-page.png";
 
 type Verification = {
   passed: boolean;
@@ -73,6 +74,7 @@ const demoChats: Chat[] = [
 ];
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "");
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -508,36 +510,51 @@ function App() {
   if (apiBaseUrl && !token) {
     return (
       <main className="auth-screen">
-        <section className="auth-card">
-          <div className="brand auth-brand"><div className="brand-mark"><img src="/logo.png" alt="" /></div><span>AOA</span></div>
-          <p className="eyebrow">{authMode === "login" ? "Welcome back" : "Create your account"}</p>
-          <h1>{authMode === "login" ? "Sign in to your workspace" : "Start with AOA"}</h1>
-          <p className="auth-copy">Your chats and document history stay available across sessions.</p>
-          {authError ? <div className="api-error">{authError}</div> : null}
-          <form className="auth-form" onSubmit={submitAuth}>
-            <input type="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} placeholder="Email address" required />
-            <input type="password" value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} placeholder="Password (8+ characters)" minLength={8} required />
-            <button className="new-chat" type="submit">{authMode === "login" ? "Sign in" : "Create account"}</button>
-          </form>
-          <div className="auth-divider"><span>or</span></div>
-          <GoogleLogin
-            onSuccess={async (credential) => {
-              if (!credential.credential) return;
-              const response = await fetch(`${apiBaseUrl}/auth/google`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id_token: credential.credential }),
-              });
-              const data = (await response.json()) as AuthUser & { detail?: string };
-              if (!response.ok) setAuthError(data.detail ?? "Google sign-in failed");
-              else completeAuth(data);
-            }}
-            onError={() => setAuthError("Google sign-in failed")}
-          />
-          <button className="auth-switch" onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}>
-            {authMode === "login" ? "Need an account? Create one" : "Already have an account? Sign in"}
-          </button>
+        <section className="auth-panel">
+          <div className="auth-card">
+            <div className="brand auth-brand"><div className="brand-mark"><img src="/logo.png" alt="" /></div><span>AOA</span></div>
+            <p className="eyebrow">{authMode === "login" ? "Welcome back" : "Create your account"}</p>
+            <h1>{authMode === "login" ? "Sign in to your workspace" : "Start with AOA"}</h1>
+            <p className="auth-copy">Your chats and document history stay available across sessions.</p>
+            {authError ? <div className="api-error">{authError}</div> : null}
+            <form className="auth-form" onSubmit={submitAuth}>
+              <input type="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} placeholder="Email address" required />
+              <input type="password" value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} placeholder="Password (8+ characters)" minLength={8} required />
+              <button className="new-chat" type="submit">{authMode === "login" ? "Sign in" : "Create account"}</button>
+            </form>
+            <div className="auth-divider"><span>or</span></div>
+            {googleClientId ? (
+              <GoogleLogin
+                shape="pill"
+                logo_alignment="center"
+                onSuccess={async (credential) => {
+                  if (!credential.credential) return;
+                  const response = await fetch(`${apiBaseUrl}/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id_token: credential.credential }),
+                  });
+                  const data = (await response.json()) as AuthUser & { detail?: string };
+                  if (!response.ok) setAuthError(data.detail ?? "Google sign-in failed");
+                  else completeAuth(data);
+                }}
+                onError={() => setAuthError("Google sign-in failed")}
+              />
+            ) : (
+              <p className="auth-copy">Google sign-in is not configured for this deployment.</p>
+            )}
+            <button className="auth-switch" onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}>
+              {authMode === "login" ? "Need an account? Create one" : "Already have an account? Sign in"}
+            </button>
+          </div>
         </section>
+        <aside className="auth-visual" aria-hidden="true">
+          <img src={loginImageUrl} alt="" />
+          <div className="auth-visual-copy">
+            <span>ANSWER OR ABSTAIN</span>
+            <p>Clear answers, <em>grounded</em> in the documents you trust.</p>
+          </div>
+        </aside>
       </main>
     );
   }
