@@ -128,7 +128,7 @@ function VerificationCard({
     <div className={`verification-card ${statusClass}`}>
       <div className="verification-header">
         <span className="verification-title">
-          <ShieldCheck size={14} /> Lynx verification
+          <ShieldCheck size={14} /> Verification
         </span>
         <strong>{status}</strong>
       </div>
