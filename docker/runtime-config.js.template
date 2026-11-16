@@ -1,0 +1,4 @@
+window.__AOA_CONFIG__ = {
+  apiBaseUrl: "${API_BASE_URL}",
+  googleClientId: "${GOOGLE_CLIENT_ID}",
+};

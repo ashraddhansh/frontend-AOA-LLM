@@ -6,7 +6,13 @@ import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ""}>
+    <GoogleOAuthProvider
+      clientId={
+        window.__AOA_CONFIG__?.googleClientId ||
+        import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+        ""
+      }
+    >
       <App />
     </GoogleOAuthProvider>
   </StrictMode>,
