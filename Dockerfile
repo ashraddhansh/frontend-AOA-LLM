@@ -16,7 +16,9 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY docker/runtime-config.js.template /etc/nginx/runtime-config.js.template
 COPY docker/default.conf.template /etc/nginx/templates/default.conf.template
 COPY docker/40-runtime-config.sh /docker-entrypoint.d/40-runtime-config.sh
+USER root
 RUN chmod +x /docker-entrypoint.d/40-runtime-config.sh
+USER nginx
 
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
