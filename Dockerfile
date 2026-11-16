@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY index.html vite.config.ts tsconfig*.json ./
+COPY image-for-login-page.png ./image-for-login-page.png
 COPY src ./src
 COPY public ./public
 RUN npm run build
